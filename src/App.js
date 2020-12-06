@@ -1,5 +1,7 @@
 import './App.css';
+import ListPlaylist from './ListPlaylist.js'
 import React from "react"
+import Spotify from "./spotify.js"
 
 const queryString = require('query-string')
 class App extends React.Component {
@@ -8,8 +10,10 @@ class App extends React.Component {
     var queryParams = queryString.parse(window.location.hash)
     console.log("query params: ", queryParams)
     if ("access_token" in queryParams || window.location.toString().includes("access_token")) {
+      var accessToken = queryParams['access_token']
+      var spotify = new Spotify(accessToken);
       return (
-        <div className="App">Success</div>
+        <ListPlaylist spotify={spotify} />
       )
     } else {
       var query = {
