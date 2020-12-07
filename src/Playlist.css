@@ -1,0 +1,33 @@
+.playlistItem {
+  display: block;
+  background-color: #555555;
+  color: white;
+  border: none;
+  padding: 15px 32px;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+
+.playlistItem:hover {
+  background-color: #999999;
+  color: white;
+}
+
+.playlist {
+  width: 100%;
+}
+
+#playlistView {
+  display: block;
+  margin: auto;
+  width: 75%;
+  height: 75%;
+}
+
+#title {
+  text-align: center;
+}
