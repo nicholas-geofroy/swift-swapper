@@ -1,0 +1,14 @@
+#header {
+  color: var(--fg-colour);
+  font-size: 80px;
+  padding: 0px 0px 40px 0px;
+}
+
+#aboutBtn {
+  font-size: 12px;
+}
+
+#buttonGroup button {
+  display: block;
+  margin: auto auto 40px auto;
+}

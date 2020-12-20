@@ -2,6 +2,7 @@ import './App.css';
 import ListPlaylist from './ListPlaylist.js'
 import React from "react"
 import Spotify from "./spotify.js"
+import TitlePage from "./TitlePage.js"
 
 const queryString = require('query-string')
 class App extends React.Component {
@@ -55,16 +56,16 @@ class App extends React.Component {
     if (loggedIn) {
       var spotify = new Spotify(accessToken);
       return (
-        <div>
-          <button onClick={this.logout}>Logout</button>
+        <div id="main">
+          <button onClick={this.logout} class="button1">Logout</button>
           <ListPlaylist spotify={spotify} />
         </div>
       );
     } else {
       return (
-        <button onClick={this.login}>
-          Login to Spotify
-        </button>
+        <div id="main">
+          <TitlePage onLogin={this.login} />
+        </div>
       );
     }
   }
