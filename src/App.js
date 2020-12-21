@@ -66,7 +66,7 @@ class App extends React.Component {
     if (loggedIn) {
       var spotify = new Spotify(accessToken);
       if (playlist) {
-        return <Swapper playlist={playlist} />
+        return <Swapper playlist={playlist} spotify={spotify} />
       } else {
         return (
           <div id="main">

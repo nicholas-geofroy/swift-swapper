@@ -5,12 +5,31 @@ import Loader from 'react-loader-spinner'
 class Swapper extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      error: null,
+      loading: true,
+    }
+
+    this.render_loading = this.render_loading.bind(this);
+    this.render_complete = this.render_complete.bind(this);
   }
 
   componentDidMount() {
+    this.props.spotify.copy_playlist(this.props.playlist)
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      }).catch(err => {
+        console.log(err);
+        this.setState({
+          loading: false,
+          error: err,
+        })
+      });
   }
 
-  render() {
+  render_loading() {
     return (
       <div id="loading screen">
         <div id="processingText">
@@ -24,6 +43,23 @@ class Swapper extends React.Component {
         />
       </div>
     );
+  }
+
+  render_complete() {
+    return (
+      <div id="processingText">
+        Complete
+      </div>
+    );
+  }
+
+  render() {
+    const { error, loading } = this.state;
+    if (loading) {
+      return this.render_loading();
+    } else {
+      return this.render_complete();
+    }
   }
 }
 

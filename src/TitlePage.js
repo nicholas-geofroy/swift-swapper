@@ -17,10 +17,10 @@ class TitlePage extends React.Component {
           Swift Swapper
         </div>
         <div id="buttonGroup">
-          <button class="button1" onClick={this.props.onLogin}>
+          <button className="button1" onClick={this.props.onLogin}>
             Login to Spotify
           </button>
-          <button class="button1" id="aboutButton">
+          <button className="button1" id="aboutButton">
             About
           </button>
         </div>

@@ -26,6 +26,7 @@ class Spotify {
     }
 
     get_playlist_tracks(playlist) {
+        console.log("Get playlist tracks for", playlist)
         return this._get_playlist_tracks_recur(
             `playlists/${playlist.id}/tracks`,
             []
@@ -34,10 +35,12 @@ class Spotify {
 
     _get_playlist_tracks_recur(next, cur_arr) {
         return this.instance.get(next).then(resp => {
-            var tracks = cur_arr.concat(resp.items);
-            if (resp.next) {
+            console.log("get some tracks", resp);
+            var data = resp.data;
+            var tracks = cur_arr.concat(data.items);
+            if (data.next) {
                 return this._get_playlist_tracks_recur(
-                    resp.next,
+                    data.next,
                     tracks
                 );
             }
@@ -47,17 +50,40 @@ class Spotify {
 
     copy_playlist(playlist) {
         return this.create_playlist(playlist.name + " copy", playlist.public, playlist.collaborative, playlist.description)
-            .then((playlist) => {
+            .then((resp) => {
+                var new_playlist = resp.data;
                 return this.get_playlist_tracks(playlist)
                     .then(tracks => {
-                        return this.add_tracks_to_playlist(playlist, tracks)
+                        console.log("all tracks:", tracks);
+                        return this.add_tracks_to_playlist(new_playlist, tracks)
                     })
             });
     }
 
     add_tracks_to_playlist(playlist, tracks) {
+        const maxUriAdd = 100;
+        if (!Array.isArray(tracks) || !tracks.length) {
+            return Promise.resolve(playlist);
+        }
+        var uris = tracks.map(track_data => track_data.track.uri);
+        console.log("add uris:", uris);
+
+        var results = []
+        for (var i = 0; i < uris.length; i += maxUriAdd) {
+            results.push(
+                Promise.resolve(uris.slice(i, i + maxUriAdd))
+                    .then(section => {
+                        this._add_chunk_to_playlist(playlist, section);
+                    })
+            );
+        }
+        return Promise.all(results).then(() => playlist);
+    }
+
+    _add_chunk_to_playlist(playlist, uris) {
+        console.log("Try adding chunk to playlist", uris);
         return this.instance.post(`playlists/${playlist.id}/tracks`, {
-            uris: tracks.map(track => track.uri)
+            uris: uris
         }).then(resp => {
             return playlist;
         });
