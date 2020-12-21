@@ -108,7 +108,8 @@ class Spotify {
     _get_playlists_recur(next, cur_arr) {
         return this.instance.get(next).then(response => {
             var pageData = response.data;
-            var playlists = cur_arr.concat(pageData.items)
+            var playlists = cur_arr.concat(pageData.items);
+            console.log("Get playlists response", response);
             if (pageData.next) {
                 return this._get_playlists_recur(
                     pageData.next,

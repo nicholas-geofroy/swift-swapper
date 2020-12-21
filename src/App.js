@@ -38,7 +38,7 @@ class App extends React.Component {
       "client_id": "cad5fe116d264749a77638ec4bfb4a2f",
       "response_type": "token",
       "redirect_uri": process.env.REACT_APP_DOMAIN,
-      "scope": "playlist-modify-private playlist-read-collaborative playlist-modify-public",
+      "scope": "playlist-read-private playlist-modify-private playlist-read-collaborative playlist-modify-public",
       "state": "logged",
       "show_dialog": showDialog,
     }
