@@ -38,7 +38,7 @@ class ListPlaylist extends React.Component {
         }
 
         const listItems = items.map(playlist => {
-            return <PlaylistItem key={playlist.id} playlist={playlist} />
+            return <PlaylistItem key={playlist.id} playlist={playlist} onSelected={this.props.onPlaylistSelected} />
         });
         return (
             <div id="playlistView">
@@ -52,9 +52,18 @@ class ListPlaylist extends React.Component {
 }
 
 class PlaylistItem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onSelected = this.onSelected.bind(this);
+    }
+
+    onSelected() {
+        this.props.onSelected(this.props.playlist);
+    }
+
     render() {
         return (
-            <button className="playlistItem">
+            <button className="playlistItem" onClick={this.onSelected}>
                 {this.props.playlist.name}
             </button>
         );

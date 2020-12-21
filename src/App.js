@@ -3,6 +3,7 @@ import ListPlaylist from './ListPlaylist.js'
 import React from "react"
 import Spotify from "./spotify.js"
 import TitlePage from "./TitlePage.js"
+import Swapper from "./Swapper.js"
 
 const queryString = require('query-string')
 class App extends React.Component {
@@ -13,10 +14,12 @@ class App extends React.Component {
       loggedIn: false,
       accessToken: "",
       showDialog: false,
+      playlist: null,
     };
 
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
   }
 
   componentDidMount() {
@@ -35,7 +38,7 @@ class App extends React.Component {
       "client_id": "cad5fe116d264749a77638ec4bfb4a2f",
       "response_type": "token",
       "redirect_uri": process.env.REACT_APP_DOMAIN,
-      "scope": "playlist-modify-private",
+      "scope": "playlist-modify-private playlist-read-collaborative playlist-modify-public",
       "state": "logged",
       "show_dialog": showDialog,
     }
@@ -51,16 +54,27 @@ class App extends React.Component {
     });
   }
 
+  onPlaylistSelected(playlist) {
+    console.log("selected", playlist.name);
+    this.setState({
+      playlist: playlist,
+    })
+  }
+
   render() {
-    const { loggedIn, accessToken } = this.state;
+    const { loggedIn, accessToken, _, playlist } = this.state;
     if (loggedIn) {
       var spotify = new Spotify(accessToken);
-      return (
-        <div id="main">
-          <button onClick={this.logout} class="button1">Logout</button>
-          <ListPlaylist spotify={spotify} />
-        </div>
-      );
+      if (playlist) {
+        return <Swapper playlist={playlist} />
+      } else {
+        return (
+          <div id="main">
+            <button onClick={this.logout} class="button1">Logout</button>
+            <ListPlaylist spotify={spotify} onPlaylistSelected={this.onPlaylistSelected} />
+          </div>
+        );
+      }
     } else {
       return (
         <div id="main">
