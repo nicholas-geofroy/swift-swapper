@@ -47,8 +47,13 @@ class Swapper extends React.Component {
 
   render_complete() {
     return (
-      <div id="processingText">
-        Complete
+      <div id="runScreen">
+        <div id="processingText">
+          Complete
+        </div>
+        <button className="button1" onClick={this.props.onComplete}>
+          Back
+        </button>
       </div>
     );
   }

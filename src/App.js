@@ -20,6 +20,7 @@ class App extends React.Component {
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
+    this.onPlaylistSwapped = this.onPlaylistSwapped.bind(this);
   }
 
   componentDidMount() {
@@ -61,12 +62,19 @@ class App extends React.Component {
     })
   }
 
+  onPlaylistSwapped() {
+    console.log("complete");
+    this.setState({
+      playlist: null
+    });
+  }
+
   render() {
     const { loggedIn, accessToken, _, playlist } = this.state;
     if (loggedIn) {
       var spotify = new Spotify(accessToken);
       if (playlist) {
-        return <Swapper playlist={playlist} spotify={spotify} />
+        return <Swapper playlist={playlist} spotify={spotify} onComplete={this.onPlaylistSwapped} />
       } else {
         return (
           <div id="main">

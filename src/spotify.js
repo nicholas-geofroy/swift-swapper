@@ -25,25 +25,33 @@ class Spotify {
         });
     }
 
-    get_playlist_tracks(playlist) {
-        console.log("Get playlist tracks for", playlist)
-        return this._get_playlist_tracks_recur(
+    map_playlist_tracks(playlist, mapping_func) {
+        return this._map_playlist_tracks_recur(
             `playlists/${playlist.id}/tracks`,
-            []
+            [],
+            mapping_func
         );
     }
 
-    _get_playlist_tracks_recur(next, cur_arr) {
+    _map_playlist_tracks_recur(next, cur_arr, mapping_func) {
         return this.instance.get(next).then(resp => {
-            console.log("get some tracks", resp);
             var data = resp.data;
-            var tracks = cur_arr.concat(data.items);
+            var new_items = mapping_func(data.items);
+            var tracks = cur_arr.concat(new_items);
             if (data.next) {
-                return this._get_playlist_tracks_recur(
+                return this._map_playlist_tracks_recur(
                     data.next,
-                    tracks
+                    tracks,
+                    mapping_func
                 );
             }
+            return tracks;
+        });
+    }
+
+    get_playlist_tracks(playlist) {
+        console.log("Get playlist tracks for", playlist)
+        return this.map_playlist_tracks(playlist, (tracks) => {
             return tracks;
         });
     }
@@ -52,11 +60,11 @@ class Spotify {
         return this.create_playlist(playlist.name + " copy", playlist.public, playlist.collaborative, playlist.description)
             .then((resp) => {
                 var new_playlist = resp.data;
-                return this.get_playlist_tracks(playlist)
-                    .then(tracks => {
-                        console.log("all tracks:", tracks);
-                        return this.add_tracks_to_playlist(new_playlist, tracks)
-                    })
+                return this.map_playlist_tracks(playlist, (track_chunk) => {
+                    return [this.add_tracks_to_playlist(new_playlist, track_chunk)];
+                }).then(promises => {
+                    return Promise.all(promises);
+                });
             });
     }
 
