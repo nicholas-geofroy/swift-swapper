@@ -6,6 +6,7 @@ import TitlePage from "./TitlePage.js"
 import Swapper from "./Swapper.js"
 
 const queryString = require('query-string')
+
 class App extends React.Component {
   constructor(props) {
     super(props);

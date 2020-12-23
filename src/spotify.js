@@ -25,9 +25,9 @@ class Spotify {
         });
     }
 
-    map_playlist_tracks(playlist, mapping_func) {
+    map_playlist_tracks(playlistId, mapping_func) {
         return this._map_playlist_tracks_recur(
-            `playlists/${playlist.id}/tracks`,
+            `playlists/${playlistId}/tracks`,
             [],
             mapping_func
         );
@@ -50,17 +50,26 @@ class Spotify {
     }
 
     get_playlist_tracks(playlist) {
+        var playlistId = null;
+
+        if (typeof (playlist) === "string") {
+            playlistId = playlist;
+        } else {
+            playlistId = playlist.id;
+        }
         console.log("Get playlist tracks for", playlist)
-        return this.map_playlist_tracks(playlist, (tracks) => {
+
+        return this.map_playlist_tracks(playlistId, (tracks) => {
             return tracks;
         });
     }
 
-    copy_playlist(playlist) {
+    copy_playlist(playlist, map_func = (x) => x) {
         return this.create_playlist(playlist.name + " copy", playlist.public, playlist.collaborative, playlist.description)
             .then((resp) => {
                 var new_playlist = resp.data;
-                return this.map_playlist_tracks(playlist, (track_chunk) => {
+                return this.map_playlist_tracks(playlist.id, (track_chunk) => {
+                    track_chunk = track_chunk.map(map_func);
                     return [this.add_tracks_to_playlist(new_playlist, track_chunk)];
                 }).then(promises => {
                     return Promise.all(promises);
@@ -107,6 +116,13 @@ class Spotify {
             }
             return this.instance.post(`users/${id}/playlists`, data);
         });
+    }
+
+    get_playlist(playlistId) {
+        return this.instance.get(`playlists/${playlistId}`)
+            .then(response => {
+                return response.data;
+            })
     }
 
     get_playlists() {

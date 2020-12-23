@@ -2,6 +2,8 @@ import React from "react"
 import "./Swapper.css"
 import Loader from 'react-loader-spinner'
 
+const newSongsPlaylistId = "6lZiChkJ3dznd84Fs9NpRv";
+
 class Swapper extends React.Component {
   constructor(props) {
     super(props);
@@ -10,13 +12,44 @@ class Swapper extends React.Component {
       loading: true,
     }
 
-    this.render_loading = this.render_loading.bind(this);
-    this.render_complete = this.render_complete.bind(this);
+    this.renderLoading = this.renderLoading.bind(this);
+    this.renderComplete = this.renderComplete.bind(this);
+    this.getNewSongs = this.getNewSongs.bind(this);
+  }
+
+  getNewSongs() {
+    return this.props.spotify.get_playlist_tracks(newSongsPlaylistId)
+      .then(newSongs => {
+        var newSongsMap = {}
+        for (var i in newSongs) {
+          var song = newSongs[i]
+          var title = song.track.name
+          newSongsMap[title] = song;
+        }
+        console.log("songs map:", newSongsMap);
+        return newSongsMap;
+      });
   }
 
   componentDidMount() {
-    this.props.spotify.copy_playlist(this.props.playlist)
-      .then(() => {
+    this.getNewSongs()
+      .then(newSongsMap => {
+        return this.props.spotify.copy_playlist(this.props.playlist, song => {
+          var isTaylorSong = song.track.artists.find(artist => artist.name == "Taylor Swift");
+          if (!isTaylorSong) {
+            return song;
+          }
+          var songName = song.track.name;
+
+          console.log("Found Taylor Swift Song", songName);
+
+          if (songName in newSongsMap) {
+            console.log("Match!");
+            return newSongsMap[songName];
+          }
+          return song;
+        });
+      }).then(() => {
         this.setState({
           loading: false,
         });
@@ -29,7 +62,7 @@ class Swapper extends React.Component {
       });
   }
 
-  render_loading() {
+  renderLoading() {
     return (
       <div id="loading screen">
         <div id="processingText">
@@ -45,7 +78,7 @@ class Swapper extends React.Component {
     );
   }
 
-  render_complete() {
+  renderComplete() {
     return (
       <div id="runScreen">
         <div id="processingText">
@@ -61,9 +94,9 @@ class Swapper extends React.Component {
   render() {
     const { error, loading } = this.state;
     if (loading) {
-      return this.render_loading();
+      return this.renderLoading();
     } else {
-      return this.render_complete();
+      return this.renderComplete();
     }
   }
 }
